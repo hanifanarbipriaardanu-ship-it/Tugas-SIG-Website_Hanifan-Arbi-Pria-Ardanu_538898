@@ -71,7 +71,7 @@
       let layerVisible = true;
       const MAX_MARKERS = 30;
 
-      // 🔵 CLASS MARKER
+      // CLASS MARKER
       class Marker {
         constructor(x, y, color) {
           this.x = x;
@@ -110,12 +110,12 @@
         }
       }
 
-      // 🔢 UPDATE COUNTER
+      //UPDATE COUNTER
       function updateCount() {
         document.getElementById("count").innerText = markers.length;
       }
 
-      // ➕ ADD MARKER
+      // ADD MARKER
       document.getElementById("btnAdd").addEventListener("click", function () {
         if (markers.length >= MAX_MARKERS) {
           alert("Hey! maksimal hanya 30 marker");
@@ -135,14 +135,14 @@
         updateCount();
       });
 
-      // 🧹 CLEAR MARKERS
+      //CLEAR MARKERS
       document.getElementById("btnClear").addEventListener("click", function () {
         markers.forEach((marker) => marker.remove());
         markers = [];
         updateCount();
       });
 
-      // 👁️ TOGGLE LAYER
+      //TOGGLE LAYER
       document.getElementById("btnToggle").addEventListener("click", function () {
         layerVisible = !layerVisible;
 
