@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebGIS DIY Interaktif</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        background: #0f172a;
+      }
+      #map {
+        width: 75%;
+        height: 100vh;
+      }
+
+      .sidebar {
+        width: 25%;
+        padding: 20px;
+        background: #020617;
+        color: white;
+      }
+
+      h2 {
+        margin-top: 0;
+        color: #38bdf8;
+      }
+
+      select,
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 10px;
+      }
+
+      select {
+        background: #1e293b;
+        color: white;
+      }
+
+      button {
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        color: white;
+        cursor: pointer;
+      }
+
+      .coords-box {
+        margin-top: 15px;
+        padding: 10px;
+        background: #1e293b;
+        border-radius: 10px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2>WebGIS DIY</h2>
+
+      <label>Pilih Warna Marker:</label>
+      <select id="markerType">
+        <option value="red">Merah</option>
+        <option value="blue">Biru</option>
+        <option value="green">Hijau</option>
+      </select>
+
+      <button onclick="markerManager.clearMarkers()">Clear All Markers</button>
+
+      <div class="coords-box" id="coordsInfo">Klik peta untuk melihat koordinat</div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+      const map = L.map("map").setView([-7.7956, 110.3695], 11);
+
+      // 🌈 BASEMAP OSM TAPI LEBIH BERWARNA (HOT Style)
+      L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap, Humanitarian",
+      }).addTo(map);
+
+      // Optional overlay jalan biar lebih jelas
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png", {
+        attribution: "&copy; OpenStreetMap & Carto",
+      }).addTo(map);
+
+      class MarkerManager {
+        constructor(map) {
+          this.map = map;
+          this.layers = {
+            red: L.layerGroup().addTo(map),
+            blue: L.layerGroup().addTo(map),
+            green: L.layerGroup().addTo(map),
+          };
+        }
+
+        getColorIcon(color) {
+          const icons = {
+            red: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+            blue: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
+            green: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
+          };
+
+          return new L.Icon({
+            iconUrl: icons[color],
+            shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+          });
+        }
+
+        addMarker(latlng, type) {
+          const marker = L.marker(latlng, {
+            icon: this.getColorIcon(type),
+          });
+
+          marker.bindPopup(`Koordinat:<br>${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`);
+
+          marker.addTo(this.layers[type]);
+        }
+
+        clearMarkers() {
+          Object.values(this.layers).forEach((layer) => layer.clearLayers());
+        }
+      }
+
+      const markerManager = new MarkerManager(map);
+
+      map.on("click", function (e) {
+        const type = document.getElementById("markerType").value;
+
+        document.getElementById("coordsInfo").innerHTML = `Latitude: ${e.latlng.lat.toFixed(6)}<br>Longitude: ${e.latlng.lng.toFixed(6)}`;
+
+        markerManager.addMarker(e.latlng, type);
+      });
+    </script>
+  </body>
+</html>

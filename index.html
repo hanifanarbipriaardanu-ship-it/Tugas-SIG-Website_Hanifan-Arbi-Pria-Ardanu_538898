@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Tugas Keaktifan SIG Website</title>
+
+    <style>
+      body {
+        font-family: Arial;
+        text-align: center;
+      }
+
+      #map {
+        width: 500px;
+        height: 400px;
+        margin: auto;
+        background: linear-gradient(to bottom, lightblue, lightgreen);
+        position: relative;
+        border: 2px solid #333;
+      }
+
+      .marker {
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .red {
+        background: red;
+      }
+      .blue {
+        background: blue;
+      }
+      .green {
+        background: green;
+      }
+
+      .popup {
+        position: absolute;
+        top: -22px;
+        left: -10px;
+        background: white;
+        border: 1px solid black;
+        padding: 2px 4px;
+        font-size: 10px;
+        border-radius: 3px;
+      }
+
+      button {
+        margin: 5px;
+        padding: 8px 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>Mini Website SIG</h2>
+
+    <button id="btnAdd">Add Marker</button>
+    <button id="btnClear">Clear All Markers</button>
+    <button id="btnToggle">Toggle Layer</button>
+
+    <p>Total markers: <span id="count">0</span></p>
+
+    <div id="map"></div>
+
+    <script>
+      let map = document.getElementById("map");
+      let markers = [];
+      let layerVisible = true;
+      const MAX_MARKERS = 30;
+
+      // 🔵 CLASS MARKER
+      class Marker {
+        constructor(x, y, color) {
+          this.x = x;
+          this.y = y;
+          this.color = color;
+
+          this.element = document.createElement("div");
+          this.element.className = "marker " + color;
+
+          this.element.style.left = x + "px";
+          this.element.style.top = y + "px";
+
+          this.element.addEventListener("click", () => this.showPopup());
+        }
+
+        addTo(map) {
+          map.appendChild(this.element);
+        }
+
+        remove() {
+          this.element.remove();
+        }
+
+        toggleVisibility(show) {
+          this.element.style.display = show ? "block" : "none";
+        }
+
+        showPopup() {
+          let popup = document.createElement("div");
+          popup.className = "popup";
+          popup.innerText = `(${this.x.toFixed(0)}, ${this.y.toFixed(0)})`;
+
+          this.element.appendChild(popup);
+
+          setTimeout(() => popup.remove(), 1500);
+        }
+      }
+
+      // 🔢 UPDATE COUNTER
+      function updateCount() {
+        document.getElementById("count").innerText = markers.length;
+      }
+
+      // ➕ ADD MARKER
+      document.getElementById("btnAdd").addEventListener("click", function () {
+        if (markers.length >= MAX_MARKERS) {
+          alert("Hey! maksimal hanya 30 marker");
+          return;
+        }
+
+        let x = Math.random() * 480;
+        let y = Math.random() * 380;
+
+        let colors = ["red", "blue", "green"];
+        let color = colors[Math.floor(Math.random() * colors.length)];
+
+        let marker = new Marker(x, y, color);
+        marker.addTo(map);
+
+        markers.push(marker);
+        updateCount();
+      });
+
+      // 🧹 CLEAR MARKERS
+      document.getElementById("btnClear").addEventListener("click", function () {
+        markers.forEach((marker) => marker.remove());
+        markers = [];
+        updateCount();
+      });
+
+      // 👁️ TOGGLE LAYER
+      document.getElementById("btnToggle").addEventListener("click", function () {
+        layerVisible = !layerVisible;
+
+        markers.forEach((marker) => marker.toggleVisibility(layerVisible));
+      });
+    </script>
+  </body>
+</html>
